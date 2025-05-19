@@ -1,14 +1,43 @@
 #include <iostream>
 #include "random.h"
 #include <string_view>
+#include <limits>
+
+void ignoreLine()
+{
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+}
+
+namespace Settings
+{
+    const int MAX = 10;
+    const int MIN = 1;
+}
 
 int getUserNum(int g)
 {
-    std::cout << "Guess #" << g << ": ";
-    int guess{};
-    std::cin >> guess;
-    return guess;
+    while (true)
+    {
+        std::cout << "Guess #" << g << ": ";
+        int guess{};
+        std::cin >> guess;
 
+        if (!std::cin)
+        {
+            std::cin.clear();
+            ignoreLine();
+            continue;
+        }
+        else if (guess > Settings::MAX || guess < Settings::MIN)
+        {
+            std::cout << "Input must be between " << Settings::MIN << " and " << Settings::MAX << '\n';
+            ignoreLine();
+            continue;
+        }
+
+        ignoreLine();
+        return guess;
+    }
 }
 
 void game()
@@ -16,7 +45,7 @@ void game()
     int num{ Random::get(1,10) };
     int guess{ -1 };
     int guessNum{ 1 };
-    while (guessNum < 7)
+    while (guessNum <= 7)
     {
         guess = getUserNum(guessNum);
         if (guess > num)
@@ -40,6 +69,8 @@ bool userPlayAgain()
         std::cout << "Do you want to play again (y/n)? ";
         char x{};
         std::cin >> x;
+        ignoreLine();
+
         switch (x)
         {
         case 'y':
@@ -49,6 +80,7 @@ bool userPlayAgain()
             return false;
             break;
         default:
+            std::cout << "Invalid Input. Please try again.\n";
             break;
         }
     }
